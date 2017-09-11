@@ -1,2 +1,2 @@
 # java_learning
-java starting project
+别样红JAVA学习
