@@ -1,6 +1,8 @@
 package main;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.OptionalInt;
 import java.util.Random;
 
@@ -31,10 +33,7 @@ public class SequenceNumber {
             min = max;
             max = min+interval;
         }
-        for (int i=0;i<count;i++)
-        {
-            System.out.println(String.format("Item%d:%s",i+1,result[i]));
-        }
+         System.out.println(Arrays.toString(result));
     }
 
     /**
@@ -58,10 +57,7 @@ public class SequenceNumber {
         {
             result[i-4]= fibonacci(i);
         }
-        for (int i=0;i<count;i++)
-        {
-            System.out.println(String.format("Item%d:%s",i+1,result[i]));
-        }
+        System.out.println(Arrays.toString(result));
     }
     /**
      * 斐波那契数列（非递归）
