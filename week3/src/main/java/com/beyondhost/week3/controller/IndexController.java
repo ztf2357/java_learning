@@ -30,10 +30,10 @@ public class IndexController {
         int[] sequentialNumbers = sequentialGenerator.sequentialGenerator(NUMBER_COUNT);
         long endTimeMillis=System.currentTimeMillis(); //获取结束时间
         System.out.println("程序运行时间： "+(startTimeMillis-endTimeMillis)+"ms");
-        Map<String,String> result = new LinkedHashMap<>();
-        result.put("StartTime",String.valueOf(startTimeMillis));
-        result.put("EndTime",String.valueOf(endTimeMillis));
-        result.put("ExecutionTime",String.valueOf(endTimeMillis-startTimeMillis));
+        Map<String,Object> result = new LinkedHashMap<>();
+        result.put("StartTime",startTimeMillis);
+        result.put("EndTime",endTimeMillis);
+        result.put("ExecutionTime",endTimeMillis - startTimeMillis);
         result.put("Result",Arrays.toString(sequentialNumbers));
         return JSON.toJSONString(result);
     }
