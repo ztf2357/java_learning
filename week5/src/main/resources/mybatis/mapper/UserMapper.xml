@@ -1,0 +1,54 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.mapper.UserMapper">
+    <select id="getUserById" resultType="User">
+        select * from user where id = #{id}
+    </select>
+
+    <insert id="addUserBatch" useGeneratedKeys="true" parameterType="java.util.List">
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            SELECT
+            LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO user(Name,
+         FullName,
+         Gender,
+         Age,
+         Mobile,
+         Email,
+         Address)
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.Name},
+            #{item.FullName},
+            #{item.Gender},
+            #{item.Age},
+            #{item.Mobile},
+            #{item.Email},
+            #{item.Address})
+        </foreach>
+    </insert>
+    <select id="searchUser" parameterType="map" resultType="User">
+        SELECT Id,Name,FullName,Gender,Age,Mobile,Email,Address
+        FROM user
+        <trim prefix="where" prefixOverrides="and|or">
+            <if test="null!=Name">
+                AND Name LIKE CONCAT('%',#{Name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="null!=FullName">
+                AND FullName LIKE CONCAT('%',#{FullName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="StartAge>0">
+                AND Age <![CDATA[ >= ]]> #{StartAge,jdbcType=INTEGER}
+            </if>
+            <if test="EndAge>0">
+                AND Age <![CDATA[ <= ]]> #{EndAge,jdbcType=INTEGER}
+            </if>
+            <if test="null!=Mobile">
+                AND Mobile=#{Mobile,jdbcType=VARCHAR}
+            </if>
+        </trim>
+        ORDER BY Id DESC
+    </select>
+</mapper>
