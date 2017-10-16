@@ -21,10 +21,8 @@ public class UserController {
     }
 
     @GetMapping(value = "{id}")
-    public String getUserById(@PathVariable(value="id") long id) {
-        User result = _userDao.getUserById(id);
-        if(result==null)return null;
-        return JSON.toJSONString(result);
+    public User getUserById(@PathVariable(value="id") long id) {
+        return _userDao.getUserById(id);
     }
 
     /**
@@ -63,7 +61,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "search",produces="application/json;charset=UTF-8")
-    public String searchUser(@RequestParam(value="name",required = true) String name,
+    public List<User> searchUser(@RequestParam(value="name",required = true) String name,
                              @RequestParam(value="fullName",required = false) String fullName,
                              @RequestParam(value="startAge",required = false) int startAge,
                              @RequestParam(value="endAge",required = false) int endAge,
@@ -89,6 +87,6 @@ public class UserController {
         {
             condition.put("Mobile",mobile);
         }
-        return JSON.toJSONString(_userDao.searchUser(condition));
+        return _userDao.searchUser(condition);
     }
 }
