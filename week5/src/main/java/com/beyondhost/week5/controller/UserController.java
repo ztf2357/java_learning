@@ -1,6 +1,5 @@
 package com.beyondhost.week5.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.beyondhost.week5.dao.UserDao;
 import com.beyondhost.week5.domain.User;
 import com.beyondhost.week5.util.RandomInfo;
@@ -28,12 +27,11 @@ public class UserController {
     /**
      * 动态构造User并批量插入
      * @param count  构造的记录数量
-     * @return
      */
     @PostMapping(value="addbatch")
     public String addUserBatch(@RequestParam("count") int count)
     {
-        List<User> userList = new ArrayList<User>();
+        List<User> userList = new ArrayList<>();
         for(int i=0;i<count;i++)
         {
             User user = new User();
@@ -58,15 +56,14 @@ public class UserController {
      * @param startAge 起始年龄
      * @param endAge 结束年龄
      * @param mobile 电话
-     * @return
      */
     @GetMapping(value = "search",produces="application/json;charset=UTF-8")
-    public List<User> searchUser(@RequestParam(value="name",required = true) String name,
+    public List<User> searchUser(@RequestParam(value="name") String name,
                              @RequestParam(value="fullName",required = false) String fullName,
                              @RequestParam(value="startAge",required = false) int startAge,
                              @RequestParam(value="endAge",required = false) int endAge,
                              @RequestParam(value="mobile",required = false) String mobile) {
-        Map<String,Object> condition = new HashMap<String,Object>();
+        Map<String,Object> condition = new HashMap<>();
         if(name!=null && name.length()>0)
         {
             condition.put("Name",name);

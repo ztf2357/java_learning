@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-import com.alibaba.fastjson.JSON;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,7 +23,7 @@ public class IndexController {
     }
 
     @GetMapping(value = "/", produces="application/json;charset=UTF-8")
-    public String Index() {
+    public Map<String,Object> Index() {
         int NUMBER_COUNT = 1000;
         long startTimeMillis=System.currentTimeMillis();   //获取开始时间
         int[] sequentialNumbers = sequentialGenerator.sequentialGenerator(NUMBER_COUNT);
@@ -35,7 +34,7 @@ public class IndexController {
         result.put("EndTime",endTimeMillis);
         result.put("ExecutionTime",endTimeMillis - startTimeMillis);
         result.put("Result",Arrays.toString(sequentialNumbers));
-        return JSON.toJSONString(result);
+        return result;
     }
 }
 
