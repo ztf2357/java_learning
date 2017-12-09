@@ -14,6 +14,7 @@ import com.beyondhost.exam.util.ConfigHelper;
 import com.beyondhost.exam.util.HttpHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,12 +27,25 @@ public class CrawlerService  {
 
     private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
 
-    public String getWebPageContent()
-    {
+    public String getWebPageContent() {
         String urlFomat = ConfigHelper.getValue(ConfigKeys.ORG_INFO_URL_FORMAT);
         String fullUrl = MessageFormat.format(urlFomat,158385112,"2017-12-07","2017-12-08");
-        String htmlString =  HttpHelper.GetContent(fullUrl);
-        return htmlString;
+        try {
+            Connection con = Jsoup.connect("http://hotel.meituan.com/158385112/");
+            //浏览器可接受的MIME类型。
+            con.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+            con.header("Accept-Encoding", "gzip, deflate");
+            con.header("Accept-Language", "zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3");
+
+            con.header("Connection", "keep-alive");
+            con.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0");
+            Document document = con.get();
+            return document.html();
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
     }
 
     public OrgInfo parseWebPageContent() {
