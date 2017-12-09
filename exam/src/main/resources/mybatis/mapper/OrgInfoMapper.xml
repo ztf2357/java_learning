@@ -5,4 +5,25 @@
     <select id="getOrgInfoByPoiId" resultType="OrgInfo">
         select * from OrgInfo where PoiId = #{poiId}
     </select>
+    <insert id="addOrgInfo" parameterType="OrgInfo">
+       INSERT INTO orginfo (PoiId,
+                OrgName,
+                Longitude,
+                Latitude,
+                Address,
+                CityId,
+                Phone,
+                RoomCount,
+                OpenTime)
+                VALUES
+            (#{PoiId},
+            #{OrgName},
+            #{Longitude},
+            #{Latitude},
+            #{Address},
+            #{CityId},
+            #{Phone},
+            #{RoomCount},
+            #{OpenTime})
+    </insert>
 </mapper>
