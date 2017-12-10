@@ -62,9 +62,8 @@ public class CrawlerJob {
 
         CompletableFuture<Void> allFuturesResult =
                 CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()]))
-                        .thenRun(()->{ jobInfo.setJobEndTime(new Date());//TODO 写日志，移除缓存});
-
-
+                        .thenRun(()->{ jobInfo.setJobEndTime(new Date());//TODO 写日志，移除缓存
+                             });
     }
 
 
