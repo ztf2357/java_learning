@@ -9,8 +9,10 @@ import java.util.*;
 
 import com.beyondhost.exam.entity.ConfigKeys;
 import com.beyondhost.exam.entity.OrgInfo;
+import com.beyondhost.exam.entity.RoomTypeInfo;
 import com.beyondhost.exam.entity.SysConst;
 import com.beyondhost.exam.util.ConfigHelper;
+import com.beyondhost.exam.util.DateTimeHelper;
 import com.beyondhost.exam.util.FileHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,18 +22,70 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 @Component
 public class CrawlerService  {
 
+    private static final int TIMEOUT_IN_MS = 5000;
     private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
 
-    public static OrgInfo getOrgInfo(long poiId) {
-        String htmlString =getWebPageContent(poiId);
-        return parseWebContent(htmlString);
+    private static Map<String,String> getCookies() {
+        Map<String,String> result = new HashMap<>();
+        result.put("IJSESSIONID","lfx31zhoz4pl1ef1ahcfs2tvy");
+        result.put("iuuid","58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86");
+        result.put("latlng","31.127014,121.360474,1512731376105");
+        result.put("ci","10");
+        result.put("cityname","%E4%B8%8A%E6%B5%B7");
+        result.put("_lxsdk_cuid","16035d0fb6dc8-05e87db276b425-5a442916-1fa400-16035d0fb6dc8");
+        result.put("uuid","3edfba9b0cd54d688b8e.1512731376.1.0.0");
+        result.put("_lxsdk_s","1603fc10093-60c-7c1-55c%7C%7C3");
+        return result;
     }
 
-    private static String getWebPageContent(long poiId) {
+    public static String getRoomTypeInfoPageContent(long poiId) {
+        String urlFormat = ConfigHelper.getValue(ConfigKeys.ROOM_TYPE_URL_FORMAT);
+        Date todayZeroTime = SysConst.TODAY_ZERO_TIME();
+        Date tomorrowZeroTime = DateTimeHelper.addDays(todayZeroTime,1);
+        String fullUrl = MessageFormat.format(urlFormat,String.valueOf(poiId),String.valueOf(todayZeroTime.getTime()),String.valueOf(tomorrowZeroTime.getTime()));
+
+        try {
+            Connection con = Jsoup.connect(fullUrl);
+            con.header("Accept", "application/json, text/plain, */*");
+            con.header("Accept-Encoding", "gzip, deflate, br");
+            con.header("Accept-Language", "zh-CN,zh;q=0.9");
+            con.header("Connection", "keep-alive");
+            con.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
+
+            con.header("Cache-Control","no-cache");
+            con.header("Pragma","no-cache");
+            con.header("Referer","http://hotel.meituan.com/158385112/");
+            con.header("Host","ihotel.meituan.com");
+            con.header("Origin","http://hotel.meituan.com");
+            con.cookies(getCookies());
+            con.data("uuid","58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86");
+            con.data("_token","eJxVjUtzgjAUhf9L1oxJeEhgxkUUC9jxhSi2HReAvETEhliwnf73hqlddHXOfPPde74Ac4/AxAghDUuAN6JrWCYGwVgeEkUC8T+m6bIqgYjtLGC+YUNGkqEah554AvwSjAg6SH9dFV3cyGpvuUICOedXE8K85sl5UCUFv4WXQVxXEGtEIZoYhkACQPiV3/sYDxUxQ3pS9kRk+Ej+yKbILsAEyaw9F2y6zO50S1fwKTs6rZIviEXb99LxmdNlvu3l69qYlKkBQ+WSK/6xCyYtW7t2rrmqaqwC3eloTbtdEDSwTWb1Hl71+yqcOtvyFscYbz7T7bDAzAu7yLWifbHxT5XDmpiKr3dvWUepFauom443tmLTl5Wf3qzEbk9lJs/5/sMmiOkLWXs+6Tv+/prOx/NlwwgdjcD3DzRvdUI=");
+            Connection.Response res = con.method(Connection.Method.POST).timeout(TIMEOUT_IN_MS).execute();
+            Document document = res.parse();
+            return document.html();
+        }
+        catch (Exception ex)
+        {
+            logger.error("读取网页内容时出错",ex);
+            return ex.toString();
+        }
+    }
+
+    public static OrgInfo getOrgInfo(long poiId) {
+        String htmlString = getOrgInfoPageContent(poiId);
+        return parseOrgInfoContent(htmlString);
+    }
+
+    private static String getOrgInfoPageContent(long poiId) {
         String urlFomat = ConfigHelper.getValue(ConfigKeys.ORG_INFO_URL_FORMAT);
         String fullUrl = MessageFormat.format(urlFomat,String.valueOf(poiId));
         try {
@@ -42,7 +96,7 @@ public class CrawlerService  {
 
             con.header("Connection", "keep-alive");
             con.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0");
-            Connection.Response res = con.method(Connection.Method.GET).execute();
+            Connection.Response res = con.method(Connection.Method.GET).timeout(TIMEOUT_IN_MS).execute();
             Document document = res.parse();
             Map<String,String> cookies = res.cookies();
             return document.html();
@@ -54,7 +108,7 @@ public class CrawlerService  {
         }
     }
 
-    private static OrgInfo parseWebContent(String htmlString) {
+    private static OrgInfo parseOrgInfoContent(String htmlString) {
         Document document = Jsoup.parse(htmlString);
         String  scriptText =  document.getElementsByTag("script").first().html();
         String tempString =  scriptText.replace("window.__INITIAL_STATE__=","");
@@ -118,5 +172,9 @@ public class CrawlerService  {
         {
             return null;
         }
+    }
+
+    public static RoomTypeInfo getRoomTypeInfo(long poiId) {
+        throw new NotImplementedException();
     }
 }

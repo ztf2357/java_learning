@@ -1,14 +1,9 @@
 package com.beyondhost.exam.controller;
 
-import com.beyondhost.exam.dao.OrgInfoDao;
-import com.beyondhost.exam.entity.OrgInfo;
-import com.beyondhost.exam.job.CrawlWebPageJob;
+import com.beyondhost.exam.job.CrawlerJob;
 import com.beyondhost.exam.service.CrawlerService;
-import javafx.beans.binding.ObjectExpression;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,16 +11,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/job/")
 public class JobController {
 
-    private final CrawlWebPageJob _service;
+    private final CrawlerJob _service;
+    private final CrawlerService _cservice;
 
     @Autowired
-    public JobController(CrawlWebPageJob service) {
+    public JobController(CrawlerJob service, CrawlerService crawlerService) {
         this._service = service;
+        this._cservice = crawlerService;
     }
 
 
     @GetMapping("index")
-    public Object index() {
-         return _service.crawMeituanWebPage();
+    public void index() {
+          _service.crawlMeituanWebPage();
+    }
+
+    @GetMapping("")
+    public Object test() {
+        return _cservice.getRoomTypeInfoPageContent(158385112);
     }
 }

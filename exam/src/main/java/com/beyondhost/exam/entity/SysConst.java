@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class SysConst {
+
     public static Date DEFAULT_DATE(){
         Calendar instance = Calendar.getInstance();
         instance.set(Calendar.DAY_OF_MONTH, 31);  //设置日期
@@ -13,5 +14,15 @@ public class SysConst {
         instance.set(Calendar.SECOND, 0);
         instance.set(Calendar.MINUTE, 0);
         return instance.getTime();
-    };
+    }
+
+
+    public static Date TODAY_ZERO_TIME() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar.getTime();
+    }
 }

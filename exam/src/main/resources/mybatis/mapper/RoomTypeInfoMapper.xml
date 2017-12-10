@@ -1,0 +1,19 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beyondhost.exam.mapper.RoomTypeInfoMapper">
+    <insert id="addRoomTypeInfo" parameterType="RoomTypeInfo">
+        INSERT INTO roomtypeinfo
+        (RoomId,
+        PartnerId,
+        PoiId,
+        RoomName,
+        OriginalPrice)
+        VALUES
+        (#{RoomId},
+        #{PartnerId},
+        #{PoiId},
+        #{RoomName},
+        #{OriginalPrice})
+    </insert>
+</mapper>

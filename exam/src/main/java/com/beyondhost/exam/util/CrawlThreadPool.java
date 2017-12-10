@@ -3,8 +3,6 @@ package com.beyondhost.exam.util;
 import java.util.concurrent.*;
 
 public class CrawlThreadPool {
-
-
     private ThreadPoolExecutor pool = null;
 
     public  CrawlThreadPool() {
@@ -17,7 +15,6 @@ public class CrawlThreadPool {
                 new CrawlRejectedExecutionHandler());
     }
 
-
     public void destory() {
         if(pool != null) {
             pool.shutdownNow();
@@ -27,7 +24,6 @@ public class CrawlThreadPool {
     public ExecutorService  getThreadPoolExecutor() {
         return this.pool;
     }
-
 
     private class CrawlRejectedExecutionHandler implements RejectedExecutionHandler {
 

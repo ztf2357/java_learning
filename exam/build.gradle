@@ -41,6 +41,7 @@ dependencies {
 	{
 		exclude module:'spring-boot-starter-tomcat'
 	}
+	compile group: 'net.sf.ehcache', name: 'ehcache', version: '2.10.4'
 	runtime('mysql:mysql-connector-java')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
