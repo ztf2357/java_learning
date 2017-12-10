@@ -5,6 +5,10 @@ import java.util.Date;
 
 public class SysConst {
 
+    public static String CRAWL_JOB_CACHE_BLOCK_NAME  = "CrawlJobCacheBlock";
+
+    public static String CRAWL_JOB_CACHE_KEY ="CurrentJobKey";
+
     public static Date DEFAULT_DATE(){
         Calendar instance = Calendar.getInstance();
         instance.set(Calendar.DAY_OF_MONTH, 31);  //设置日期

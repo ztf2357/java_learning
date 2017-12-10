@@ -1,5 +1,6 @@
 package com.beyondhost.exam.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -12,4 +13,11 @@ public class DateTimeHelper {
         date = calendar.getTime();
         return date;
     }
+
+    public static String format(Date date,String format)
+    {
+        SimpleDateFormat timeFormater=new SimpleDateFormat(format);
+        return timeFormater.format(date);
+    }
+
 }

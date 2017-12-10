@@ -48,4 +48,9 @@ public class EhcacheHelper {
         Cache cache = manager.getCache(cacheName);
         cache.remove(key);
     }
+
+    public Boolean isKeyExists(String cacheName, String key) {
+        Cache cache = manager.getCache(cacheName);
+        return cache.isElementInMemory(key);
+    }
 }
