@@ -18,7 +18,7 @@ CREATE TABLE `OrgInfo` (
   "PartnerId" bigint(20) NOT NULL,
   "PoiId" bigint(20) NOT NULL,
   "RoomName" varchar(50) NOT NULL,
-  "OriginalPrice" decimal(10,2) NOT NULL,
+  "OriginalPrice" int(11) NOT NULL,
   PRIMARY KEY ("RoomId","PartnerId","PoiId")
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

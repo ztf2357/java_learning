@@ -11,7 +11,7 @@
             timeToLiveSeconds="120"
             overflowToDisk="false"/>
 
-    <cache nam="CrawlJobCacheBlock"
+    <cache name="CrawlJobCacheBlock"
             maxElementsInMemory="1000"
             eternal="false"
             timeToIdleSeconds="0"

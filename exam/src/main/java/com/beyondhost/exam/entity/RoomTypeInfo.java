@@ -11,5 +11,5 @@ public class RoomTypeInfo {
     public long PartnerId;
     public long PoiId;
     public String RoomName;
-    public BigDecimal OriginalPrice;
+    public int OriginalPrice;
 }

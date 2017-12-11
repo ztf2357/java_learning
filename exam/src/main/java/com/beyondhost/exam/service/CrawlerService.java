@@ -16,9 +16,11 @@ import com.beyondhost.exam.util.DateTimeHelper;
 import com.beyondhost.exam.util.FileHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -46,32 +48,25 @@ public class CrawlerService  {
         result.put("_lxsdk_s","1603fc10093-60c-7c1-55c%7C%7C3");
         return result;
     }
-
     public static String getRoomTypeInfoPageContent(long poiId) {
         String urlFormat = ConfigHelper.getValue(ConfigKeys.ROOM_TYPE_URL_FORMAT);
         Date todayZeroTime = SysConst.TODAY_ZERO_TIME();
         Date tomorrowZeroTime = DateTimeHelper.addDays(todayZeroTime,1);
         String fullUrl = MessageFormat.format(urlFormat,String.valueOf(poiId),String.valueOf(todayZeroTime.getTime()),String.valueOf(tomorrowZeroTime.getTime()));
 
+        fullUrl+="&uuid=58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86";
+        fullUrl+= "&_token=eJxNjV1vgjAYRv9LbyXSUopA4oUCfkAUdd10WbwAxMIAgYqCLvvvq5lLlrzJeXJykvcL8PkBmAhCSJAEmrPYBCkG0TA2VKRIIPrvVAQHhgRC/mYD8wMZCpQM1dg/zEaIX4OgDvfS31bFVlRxj2ouIpA0TWXKclI2cd4v4rS5BKd+VBYyIjrWCUKKDCQARF9Q0QtmTwZPNk+eU3YCJojdNk+547Pb6HW0kifsMNW7bqnbo7bOZpTPOkanm2RdGlZ2NOQAnxJMD902bUuX+dOZvwrhZQypB9cV515EdlqWBZ8yxdkRBl7pRjrhdV70SOfwbYHSemKHO2ZV5EZ5FY3zzd11tPyqLzGjTuxYy3rB2s7vqZNBeLfWtqqheLG7v1zPivjkN0WvSuJ328MLTtrhEHz/AO1Mc2g=";
+
         try {
             Connection con = Jsoup.connect(fullUrl);
-            con.header("Accept", "application/json, text/plain, */*");
+            con.header("Accept", "text/html, application/xhtml+xml, */*");
             con.header("Accept-Encoding", "gzip, deflate, br");
             con.header("Accept-Language", "zh-CN,zh;q=0.9");
-            con.header("Connection", "keep-alive");
             con.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
-
-            con.header("Cache-Control","no-cache");
-            con.header("Pragma","no-cache");
-            con.header("Referer","http://hotel.meituan.com/158385112/");
             con.header("Host","ihotel.meituan.com");
-            con.header("Origin","http://hotel.meituan.com");
-            con.cookies(getCookies());
-            con.data("uuid","58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86");
-            con.data("_token","eJxVjUtzgjAUhf9L1oxJeEhgxkUUC9jxhSi2HReAvETEhliwnf73hqlddHXOfPPde74Ac4/AxAghDUuAN6JrWCYGwVgeEkUC8T+m6bIqgYjtLGC+YUNGkqEah554AvwSjAg6SH9dFV3cyGpvuUICOedXE8K85sl5UCUFv4WXQVxXEGtEIZoYhkACQPiV3/sYDxUxQ3pS9kRk+Ej+yKbILsAEyaw9F2y6zO50S1fwKTs6rZIviEXb99LxmdNlvu3l69qYlKkBQ+WSK/6xCyYtW7t2rrmqaqwC3eloTbtdEDSwTWb1Hl71+yqcOtvyFscYbz7T7bDAzAu7yLWifbHxT5XDmpiKr3dvWUepFauom443tmLTl5Wf3qzEbk9lJs/5/sMmiOkLWXs+6Tv+/prOx/NlwwgdjcD3DzRvdUI=");
-            Connection.Response res = con.method(Connection.Method.POST).timeout(TIMEOUT_IN_MS).execute();
-            Document document = res.parse();
-            return document.html();
+            Connection.Response res = con.method(Connection.Method.GET).ignoreContentType(true).timeout(TIMEOUT_IN_MS).execute();
+            String document = res.body();
+            return document;
         }
         catch (Exception ex)
         {
@@ -175,6 +170,34 @@ public class CrawlerService  {
     }
 
     public static RoomTypeInfo getRoomTypeInfo(long poiId) {
-        throw new NotImplementedException();
+       String jsonString = getRoomTypeInfoPageContent(poiId);
+       return parseRoomTypeInfoContent(jsonString);
+    }
+
+    private static RoomTypeInfo parseRoomTypeInfoContent(String jsonString) {
+        RoomTypeInfo info = new RoomTypeInfo();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode node = mapper.readTree(jsonString);
+            Iterator<JsonNode> poiData = node.get("mergeList").get("data").elements();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            while(poiData.hasNext())
+            {
+                JsonNode extAttr = poiData.next();
+                JsonNode goodsNode = extAttr.get("aggregateGoods").get("prepayGood");
+                JsonNode goodsRoomModelNode = goodsNode.get("goodsRoomModel");
+                info.setPoiId(goodsRoomModelNode.get("poiId").asLong());
+                info.setRoomId(goodsRoomModelNode.get("roomId").asLong());
+                info.setPartnerId(goodsRoomModelNode.get("partnerId").asLong());
+                info.setRoomName(goodsRoomModelNode.get("roomName").asText());
+                info.setOriginalPrice(goodsRoomModelNode.get("originalPrice").asInt());
+
+            }
+            return info;
+        }catch(IOException ex)
+        {
+            logger.error("解析 json出错",ex);
+            return  null;
+        }
     }
 }

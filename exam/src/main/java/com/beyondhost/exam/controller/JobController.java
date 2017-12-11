@@ -17,26 +17,16 @@ import java.text.MessageFormat;
 @RequestMapping("/job/")
 public class JobController {
 
-    private final CrawlerJob _service;
-    private final CrawlerService _cservice;
-    private static final EhcacheHelper cache = EhcacheHelper.getInstance();
-
     @Autowired
-    public JobController(CrawlerJob service, CrawlerService crawlerService) {
-        this._service = service;
-        this._cservice = crawlerService;
-    }
+    private CrawlerJob _job;
+    private static final EhcacheHelper cache = EhcacheHelper.getInstance();
 
 
     @GetMapping("index")
     public void index() {
-          _service.crawlMeituanWebPage();
+          _job.crawlMeituanWebPage();
     }
 
-    @GetMapping("")
-    public Object test() {
-        return _cservice.getRoomTypeInfoPageContent(158385112);
-    }
 
     @GetMapping("process")
     public String getJobProcess()
