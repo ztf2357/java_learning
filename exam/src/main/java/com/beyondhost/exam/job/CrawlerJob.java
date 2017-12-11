@@ -23,17 +23,11 @@ import java.util.concurrent.*;
 public class CrawlerJob {
 
     private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
-    private final OrgInfoDao _orgInfoDao;
-    private final RoomTypeInfoDao _roomTypeInfoDao;
     private static final EhcacheHelper cache = EhcacheHelper.getInstance();
-
     @Autowired
-    public CrawlerJob(OrgInfoDao orgInfoDao, RoomTypeInfoDao roomTypeInfoDao)
-    {
-        this._orgInfoDao = orgInfoDao;
-        this._roomTypeInfoDao = roomTypeInfoDao;
-    }
-
+    private  OrgInfoDao _orgInfoDao;
+    @Autowired
+    private  RoomTypeInfoDao _roomTypeInfoDao;
 
     //@Scheduled(cron = "${jobs.cron}")
     public void crawlMeituanWebPage() {
@@ -47,12 +41,22 @@ public class CrawlerJob {
         {
             long poiId = Long.valueOf(poiString);
             CompletableFuture<Void> orgInfoFuture =   CompletableFuture.supplyAsync(()-> CrawlerService.getOrgInfo(poiId))
-                    .thenAcceptAsync(info -> { _orgInfoDao.addOrgInfo(info); })
-                    .thenRunAsync(()-> { jobInfo.increaseOrgInfoNum(); updateJobProcess(jobInfo);});
+                    .thenAcceptAsync(info -> {
+                            if(info!=null)
+                            {
+                                _orgInfoDao.addOrgInfo(info);
+                                jobInfo.increaseOrgInfoNum();
+                                updateJobProcess(jobInfo);
+                            }});
 
             CompletableFuture<Void> roomTypeFuture = CompletableFuture.supplyAsync(()-> CrawlerService.getRoomTypeInfo(poiId))
-                    .thenAcceptAsync(info ->  _roomTypeInfoDao.addRoomTypeInfo(info))
-                    .thenRunAsync(()-> {jobInfo.increaseRoomTypeInfoNum();updateJobProcess(jobInfo);});
+                    .thenAcceptAsync(info ->{
+                                if(info!=null)
+                                {
+                                    _roomTypeInfoDao.addRoomTypeInfo(info);
+                                    jobInfo.increaseRoomTypeInfoNum();
+                                    updateJobProcess(jobInfo);
+                                }});
             futureList.add(orgInfoFuture);
             futureList.add(roomTypeFuture);
 

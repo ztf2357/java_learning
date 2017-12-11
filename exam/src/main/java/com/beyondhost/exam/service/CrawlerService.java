@@ -36,18 +36,6 @@ public class CrawlerService  {
     private static final int TIMEOUT_IN_MS = 5000;
     private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
 
-    private static Map<String,String> getCookies() {
-        Map<String,String> result = new HashMap<>();
-        result.put("IJSESSIONID","lfx31zhoz4pl1ef1ahcfs2tvy");
-        result.put("iuuid","58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86");
-        result.put("latlng","31.127014,121.360474,1512731376105");
-        result.put("ci","10");
-        result.put("cityname","%E4%B8%8A%E6%B5%B7");
-        result.put("_lxsdk_cuid","16035d0fb6dc8-05e87db276b425-5a442916-1fa400-16035d0fb6dc8");
-        result.put("uuid","3edfba9b0cd54d688b8e.1512731376.1.0.0");
-        result.put("_lxsdk_s","1603fc10093-60c-7c1-55c%7C%7C3");
-        return result;
-    }
     public static String getRoomTypeInfoPageContent(long poiId) {
         String urlFormat = ConfigHelper.getValue(ConfigKeys.ROOM_TYPE_URL_FORMAT);
         Date todayZeroTime = SysConst.TODAY_ZERO_TIME();
@@ -59,7 +47,7 @@ public class CrawlerService  {
 
         try {
             Connection con = Jsoup.connect(fullUrl);
-            con.header("Accept", "text/html, application/xhtml+xml, */*");
+            con.header("Accept", "application/json, text/plain, */*");
             con.header("Accept-Encoding", "gzip, deflate, br");
             con.header("Accept-Language", "zh-CN,zh;q=0.9");
             con.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
@@ -88,12 +76,11 @@ public class CrawlerService  {
             con.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
             con.header("Accept-Encoding", "gzip, deflate");
             con.header("Accept-Language", "zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3");
-
             con.header("Connection", "keep-alive");
             con.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0");
+
             Connection.Response res = con.method(Connection.Method.GET).timeout(TIMEOUT_IN_MS).execute();
             Document document = res.parse();
-            Map<String,String> cookies = res.cookies();
             return document.html();
         }
         catch (Exception ex)
@@ -104,6 +91,7 @@ public class CrawlerService  {
     }
 
     private static OrgInfo parseOrgInfoContent(String htmlString) {
+        if(htmlString==null) return null;
         Document document = Jsoup.parse(htmlString);
         String  scriptText =  document.getElementsByTag("script").first().html();
         String tempString =  scriptText.replace("window.__INITIAL_STATE__=","");
@@ -165,7 +153,8 @@ public class CrawlerService  {
             return content.split(" ");
         }catch (FileNotFoundException ex)
         {
-            return null;
+            logger.error("poi文件未能读取",ex);
+            return new String[]{};
         }
     }
 
@@ -175,6 +164,7 @@ public class CrawlerService  {
     }
 
     private static RoomTypeInfo parseRoomTypeInfoContent(String jsonString) {
+        if(jsonString==null) return null;
         RoomTypeInfo info = new RoomTypeInfo();
         ObjectMapper mapper = new ObjectMapper();
         try {
