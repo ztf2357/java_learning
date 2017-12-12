@@ -55,7 +55,9 @@ public class CrawlerJob {
                                 if(infos!=null)
                                 {
                                     _roomTypeInfoDao.addRoomTypeInfos(infos);
-                                    jobInfo.increaseRoomTypeInfoNum(infos.size());
+                                    for(int i=0;i<infos.size();i++) {
+                                        jobInfo.increaseRoomTypeInfoNum();
+                                    }
                                     updateJobProcess(jobInfo);
                                 }});
             futureList.add(orgInfoFuture);

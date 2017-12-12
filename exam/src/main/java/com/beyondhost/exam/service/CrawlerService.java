@@ -181,7 +181,6 @@ public class CrawlerService  {
         try {
             JsonNode node = mapper.readTree(jsonString);
             Iterator<JsonNode> poiData = node.get("mergeList").get("data").elements();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             while(poiData.hasNext())
             {
                 JsonNode extAttr = poiData.next();

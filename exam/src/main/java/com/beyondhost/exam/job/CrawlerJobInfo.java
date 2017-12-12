@@ -37,11 +37,9 @@ public class CrawlerJobInfo {
         orgInfoNum.incrementAndGet();
     }
 
-    public void increaseRoomTypeInfoNum(int num)
+    public void increaseRoomTypeInfoNum()
     {
-        for(int i=0;i< num;i++) {
-            roomTypeNum.incrementAndGet();
-        }
+        roomTypeNum.incrementAndGet();
     }
 
     public int getOrgInfoNum()
