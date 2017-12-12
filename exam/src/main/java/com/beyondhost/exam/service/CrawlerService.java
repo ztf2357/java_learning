@@ -177,7 +177,6 @@ public class CrawlerService  {
 
     private static List<RoomTypeInfo> parseRoomTypeInfoContent(String jsonString) {
         List<RoomTypeInfo> resultList = new ArrayList<RoomTypeInfo>();
-        RoomTypeInfo info = new RoomTypeInfo();
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode node = mapper.readTree(jsonString);
@@ -190,7 +189,7 @@ public class CrawlerService  {
                     JsonNode goodsNode = prepayGoods.next();
                     JsonNode prepayGoodNode = goodsNode.get("prepayGood");
                     JsonNode goodsRoomModelNode =  prepayGoodNode.get("goodsRoomModel");
-
+                    RoomTypeInfo info = new RoomTypeInfo();
                     info.setPoiId(goodsRoomModelNode.get("poiId").asLong());
                     info.setRoomId(goodsRoomModelNode.get("roomId").asLong());
                     info.setPartnerId(goodsRoomModelNode.get("partnerId").asLong());
