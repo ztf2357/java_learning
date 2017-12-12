@@ -30,7 +30,7 @@ public class CrawlerJob {
     @Autowired
     private  RoomTypeInfoDao _roomTypeInfoDao;
 
-    @Scheduled(cron = "${jobs.cron}")
+    //@Scheduled(cron = "${jobs.cron}")
     public void crawlMeituanWebPage() {
         CrawlerJobInfo jobInfo = new CrawlerJobInfo();
         jobInfo.setJobStartTime(new Date());
@@ -41,7 +41,7 @@ public class CrawlerJob {
         for (String poiString:poiList)
         {
             long poiId = Long.valueOf(poiString);
-            CompletableFuture<Void> orgInfoFuture =   CompletableFuture.supplyAsync(()-> CrawlerService.getOrgInfo(poiId))
+            CompletableFuture<Void> orgInfoFuture =  CompletableFuture.supplyAsync(()-> CrawlerService.getOrgInfo(poiId))
                     .thenAcceptAsync(info -> {
                             if(info!=null)
                             {
@@ -83,6 +83,7 @@ public class CrawlerJob {
                                 logger.info(jobResultLog);
                                 cache.remove(SysConst.CRAWL_JOB_CACHE_BLOCK_NAME,SysConst.CRAWL_JOB_CACHE_KEY);
                              });
+        allFuturesResult.join();
     }
 
 

@@ -55,7 +55,7 @@ public class CrawlerService  {
         String fullUrl = MessageFormat.format(urlFormat,String.valueOf(poiId),String.valueOf(todayZeroTime.getTime()),String.valueOf(tomorrowZeroTime.getTime()));
 
         fullUrl+="&uuid=58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86";
-        fullUrl+= "&_token=eJxVzV1PwjAUgOH/0lsa19MP13IHW+VLERg6wHiBONnGGJNtIBj/ux0CiUmT8+TNSc832nbeUR0IIQIwKnJjAYxw4ECFIhgt/jd5a9rb9tlF9RdQlGDF1WtVRib8FSCSvOKLuTHl5lVbHbOEwqLI6pYVbooguVkHUVHO05vFZm2BkEwKAGohjJDZX4+rfSEkVsw2TfBK9CRqRCqxq6i6ysaKqqvERcBPkljKU2OA5flngm3TzNFVddTM+XkW55lHyxTVUdDdJ1GcP4ZO46nxqKKhnwbc0kXvbrikvthN9WG10U5/H83sGrA4cQfjzAfoddsNZ6mZ3Y+Pt2zeivV4Zfe29/5Mtl33a2CN7G7HL+Ho+EU5mrA0CbfBZOItdTM5DkdBkNeUCHXSPqyGh4nsTHdNXzstJy8HjQ28hw9uNo2bXtTnmSJpmnzMSpZ5XhrUPsPaXue5t0vRzy+PFoW3";
+        fullUrl+= "&_token=eJxVis1ugkAURt9lthCZyzDCsEOYKtr6A7agjQurVEAcqYBWm757h9QumtzkOzn3fKGTv0U2YIwpqKiuJFMgmFpUJzoxVbT55wxguoreTi8esl8lY5UZbNWaQIpfA9jCK/WPDcm6Ia+tfBmhtK5LW9PSY50UnUOS1c1adDbHgwbUIhYF0DWkIiT7w7ztAbpMtSiTEoBRlRHcPvftU+76vvV9q2wnkI2S4aXI8mqSus6zM2HZLBKJofF69DDb6RE9L/h1f+Tu+JItTQVIXnjTeRkBjIYDx91xYo7zW5es+zmf783R6TFaWgPP+5xqgTn0owZublQ3QUxEkZ6SOA53vFfcZkGSVAqjKS8G1/3sGlv+4tyLuNt3q2bqHGGbPnnlIu+F2dgoGRaieF82pAxDkSgfqXLhVRWeBfr+AT1HdYw=";
 
         try {
             Connection con = Jsoup.connect(fullUrl);
@@ -64,6 +64,7 @@ public class CrawlerService  {
             con.header("Accept-Language", "zh-CN,zh;q=0.9");
             con.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
             con.header("Host","ihotel.meituan.com");
+            con.header("Origin","http://hotel.meituan.com");
             Connection.Response res = con.method(Connection.Method.GET).ignoreContentType(true).timeout(TIMEOUT_IN_MS).execute();
             String document = res.body();
             return document;
@@ -184,9 +185,9 @@ public class CrawlerService  {
             while(poiData.hasNext())
             {
                 JsonNode extAttr = poiData.next();
-                Iterator<JsonNode> goodsNodeArray = extAttr.get("aggregateGoods").elements();
-                while(goodsNodeArray.hasNext()) {
-                    JsonNode goodsNode = goodsNodeArray.next();
+                Iterator<JsonNode> prepayGoods = extAttr.get("aggregateGoods").elements();
+                while(prepayGoods.hasNext()) {
+                    JsonNode goodsNode = prepayGoods.next();
                     JsonNode prepayGoodNode = goodsNode.get("prepayGood");
                     JsonNode goodsRoomModelNode =  prepayGoodNode.get("goodsRoomModel");
 
