@@ -22,10 +22,10 @@ public class JobController {
     private static final EhcacheHelper cache = EhcacheHelper.getInstance();
 
 
-    @GetMapping("index")
+/*    @GetMapping("index")
     public void index() {
           _job.crawlMeituanWebPage();
-    }
+    }*/
 
 
     @GetMapping("process")

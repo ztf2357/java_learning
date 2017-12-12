@@ -36,7 +36,7 @@ public class CrawlerJob {
         jobInfo.setJobStartTime(new Date());
         updateJobProcess(jobInfo);
 
-        String[] poiList =  new String[]{"158385112"};//CrawlerService.getPoiIdList();
+        String[] poiList = CrawlerService.getPoiIdList();// new String[]{"158385112"};
         List<CompletableFuture<Void>> futureList = new ArrayList<CompletableFuture<Void>>();
         for (String poiString:poiList)
         {
