@@ -2,7 +2,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beyondhost.exam.mapper.RoomTypeInfoMapper">
-    <insert id="addRoomTypeInfo" parameterType="RoomTypeInfo">
+    <insert id="addRoomTypeInfos" parameterType="java.util.List">
         INSERT INTO roomtypeinfo
         (RoomId,
         PartnerId,
@@ -10,10 +10,12 @@
         RoomName,
         OriginalPrice)
         VALUES
-        (#{RoomId},
-        #{PartnerId},
-        #{PoiId},
-        #{RoomName},
-        #{OriginalPrice})
+        <foreach collection="list" item="item" index="index" separator="," >
+        (#{item.RoomId},
+        #{item.PartnerId},
+        #{item.PoiId},
+        #{item.RoomName},
+        #{item.OriginalPrice})
+        </foreach>
     </insert>
 </mapper>

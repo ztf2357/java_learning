@@ -17,8 +17,6 @@
         <springProfile name="prod">
             <logger name="com.beyondhost.exam" level="INFO">
                 <appender-ref ref="infoAppender"/>
-            </logger>
-            <logger name="com.beyondhost.exam" level="Error">
                 <appender-ref ref="errorAppender"/>
             </logger>
         </springProfile>
@@ -36,6 +34,11 @@
         <encoder>
             <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
     </appender>
     <appender name="errorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <Prudent>true</Prudent>
@@ -50,5 +53,10 @@
         <encoder>
             <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
     </appender>
 </configuration>

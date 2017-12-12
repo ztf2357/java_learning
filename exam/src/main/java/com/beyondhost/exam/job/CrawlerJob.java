@@ -10,6 +10,7 @@ import com.beyondhost.exam.util.RandomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -29,7 +30,7 @@ public class CrawlerJob {
     @Autowired
     private  RoomTypeInfoDao _roomTypeInfoDao;
 
-    //@Scheduled(cron = "${jobs.cron}")
+    @Scheduled(cron = "${jobs.cron}")
     public void crawlMeituanWebPage() {
         CrawlerJobInfo jobInfo = new CrawlerJobInfo();
         jobInfo.setJobStartTime(new Date());
@@ -50,11 +51,11 @@ public class CrawlerJob {
                             }});
 
             CompletableFuture<Void> roomTypeFuture = CompletableFuture.supplyAsync(()-> CrawlerService.getRoomTypeInfo(poiId))
-                    .thenAcceptAsync(info ->{
-                                if(info!=null)
+                    .thenAcceptAsync(infos ->{
+                                if(infos!=null)
                                 {
-                                    _roomTypeInfoDao.addRoomTypeInfo(info);
-                                    jobInfo.increaseRoomTypeInfoNum();
+                                    _roomTypeInfoDao.addRoomTypeInfos(infos);
+                                    jobInfo.increaseRoomTypeInfoNum(infos.size());
                                     updateJobProcess(jobInfo);
                                 }});
             futureList.add(orgInfoFuture);

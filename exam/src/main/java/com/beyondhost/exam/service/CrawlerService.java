@@ -36,6 +36,18 @@ public class CrawlerService  {
     private static final int TIMEOUT_IN_MS = 5000;
     private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
 
+    private static Map<String,String> getCookies() {
+        Map<String,String> result = new HashMap<>();
+        result.put("IJSESSIONID","lfx31zhoz4pl1ef1ahcfs2tvy");
+        result.put("iuuid","58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86");
+        result.put("latlng","31.127014,121.360474,1512731376105");
+        result.put("ci","10");
+        result.put("cityname","%E4%B8%8A%E6%B5%B7");
+        result.put("_lxsdk_cuid","16035d0fb6dc8-05e87db276b425-5a442916-1fa400-16035d0fb6dc8");
+        result.put("uuid","3edfba9b0cd54d688b8e.1512731376.1.0.0");
+        result.put("_lxsdk_s","1603fc10093-60c-7c1-55c%7C%7C3");
+        return result;
+    }
     public static String getRoomTypeInfoPageContent(long poiId) {
         String urlFormat = ConfigHelper.getValue(ConfigKeys.ROOM_TYPE_URL_FORMAT);
         Date todayZeroTime = SysConst.TODAY_ZERO_TIME();
@@ -43,11 +55,11 @@ public class CrawlerService  {
         String fullUrl = MessageFormat.format(urlFormat,String.valueOf(poiId),String.valueOf(todayZeroTime.getTime()),String.valueOf(tomorrowZeroTime.getTime()));
 
         fullUrl+="&uuid=58041698C0D5DD2D72F152B3E335416E4AD943311069BA2FD6EA87E91F3EFD86";
-        fullUrl+= "&_token=eJxNjV1vgjAYRv9LbyXSUopA4oUCfkAUdd10WbwAxMIAgYqCLvvvq5lLlrzJeXJykvcL8PkBmAhCSJAEmrPYBCkG0TA2VKRIIPrvVAQHhgRC/mYD8wMZCpQM1dg/zEaIX4OgDvfS31bFVlRxj2ouIpA0TWXKclI2cd4v4rS5BKd+VBYyIjrWCUKKDCQARF9Q0QtmTwZPNk+eU3YCJojdNk+547Pb6HW0kifsMNW7bqnbo7bOZpTPOkanm2RdGlZ2NOQAnxJMD902bUuX+dOZvwrhZQypB9cV515EdlqWBZ8yxdkRBl7pRjrhdV70SOfwbYHSemKHO2ZV5EZ5FY3zzd11tPyqLzGjTuxYy3rB2s7vqZNBeLfWtqqheLG7v1zPivjkN0WvSuJ328MLTtrhEHz/AO1Mc2g=";
+        fullUrl+= "&_token=eJxVzV1PwjAUgOH/0lsa19MP13IHW+VLERg6wHiBONnGGJNtIBj/ux0CiUmT8+TNSc832nbeUR0IIQIwKnJjAYxw4ECFIhgt/jd5a9rb9tlF9RdQlGDF1WtVRib8FSCSvOKLuTHl5lVbHbOEwqLI6pYVbooguVkHUVHO05vFZm2BkEwKAGohjJDZX4+rfSEkVsw2TfBK9CRqRCqxq6i6ysaKqqvERcBPkljKU2OA5flngm3TzNFVddTM+XkW55lHyxTVUdDdJ1GcP4ZO46nxqKKhnwbc0kXvbrikvthN9WG10U5/H83sGrA4cQfjzAfoddsNZ6mZ3Y+Pt2zeivV4Zfe29/5Mtl33a2CN7G7HL+Ho+EU5mrA0CbfBZOItdTM5DkdBkNeUCHXSPqyGh4nsTHdNXzstJy8HjQ28hw9uNo2bXtTnmSJpmnzMSpZ5XhrUPsPaXue5t0vRzy+PFoW3";
 
         try {
             Connection con = Jsoup.connect(fullUrl);
-            con.header("Accept", "application/json, text/plain, */*");
+            con.header("Accept", "application/json, */*");
             con.header("Accept-Encoding", "gzip, deflate, br");
             con.header("Accept-Language", "zh-CN,zh;q=0.9");
             con.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
@@ -76,11 +88,12 @@ public class CrawlerService  {
             con.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
             con.header("Accept-Encoding", "gzip, deflate");
             con.header("Accept-Language", "zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3");
+
             con.header("Connection", "keep-alive");
             con.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0");
-
             Connection.Response res = con.method(Connection.Method.GET).timeout(TIMEOUT_IN_MS).execute();
             Document document = res.parse();
+            Map<String,String> cookies = res.cookies();
             return document.html();
         }
         catch (Exception ex)
@@ -91,7 +104,6 @@ public class CrawlerService  {
     }
 
     private static OrgInfo parseOrgInfoContent(String htmlString) {
-        if(htmlString==null) return null;
         Document document = Jsoup.parse(htmlString);
         String  scriptText =  document.getElementsByTag("script").first().html();
         String tempString =  scriptText.replace("window.__INITIAL_STATE__=","");
@@ -153,18 +165,17 @@ public class CrawlerService  {
             return content.split(" ");
         }catch (FileNotFoundException ex)
         {
-            logger.error("poi文件未能读取",ex);
-            return new String[]{};
+            return null;
         }
     }
 
-    public static RoomTypeInfo getRoomTypeInfo(long poiId) {
+    public static List<RoomTypeInfo> getRoomTypeInfo(long poiId) {
        String jsonString = getRoomTypeInfoPageContent(poiId);
        return parseRoomTypeInfoContent(jsonString);
     }
 
-    private static RoomTypeInfo parseRoomTypeInfoContent(String jsonString) {
-        if(jsonString==null) return null;
+    private static List<RoomTypeInfo> parseRoomTypeInfoContent(String jsonString) {
+        List<RoomTypeInfo> resultList = new ArrayList<RoomTypeInfo>();
         RoomTypeInfo info = new RoomTypeInfo();
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -174,16 +185,22 @@ public class CrawlerService  {
             while(poiData.hasNext())
             {
                 JsonNode extAttr = poiData.next();
-                JsonNode goodsNode = extAttr.get("aggregateGoods").get("prepayGood");
-                JsonNode goodsRoomModelNode = goodsNode.get("goodsRoomModel");
-                info.setPoiId(goodsRoomModelNode.get("poiId").asLong());
-                info.setRoomId(goodsRoomModelNode.get("roomId").asLong());
-                info.setPartnerId(goodsRoomModelNode.get("partnerId").asLong());
-                info.setRoomName(goodsRoomModelNode.get("roomName").asText());
-                info.setOriginalPrice(goodsRoomModelNode.get("originalPrice").asInt());
+                Iterator<JsonNode> goodsNodeArray = extAttr.get("aggregateGoods").elements();
+                while(goodsNodeArray.hasNext()) {
+                    JsonNode goodsNode = goodsNodeArray.next();
+                    JsonNode prepayGoodNode = goodsNode.get("prepayGood");
+                    JsonNode goodsRoomModelNode =  prepayGoodNode.get("goodsRoomModel");
 
+                    info.setPoiId(goodsRoomModelNode.get("poiId").asLong());
+                    info.setRoomId(goodsRoomModelNode.get("roomId").asLong());
+                    info.setPartnerId(goodsRoomModelNode.get("partnerId").asLong());
+                    info.setRoomName(goodsRoomModelNode.get("roomName").asText());
+                    info.setOriginalPrice(prepayGoodNode.get("originalPrice").asInt());
+
+                    resultList.add(info);
+                }
             }
-            return info;
+            return resultList;
         }catch(IOException ex)
         {
             logger.error("解析 json出错",ex);
