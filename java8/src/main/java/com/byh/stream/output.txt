@@ -1,0 +1,29 @@
+original sample list:[9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 35, 9, 7, 8]
+map demo:[109, 108, 107, 106, 105, 104, 103, 102, 101, 102, 135, 109, 107, 108]
+filter demo:[9, 8, 7, 6, 5, 4, 35, 9, 7, 8]
+min demo:1
+max demo:35
+all match demo:true
+anymatch demo:false
+nonematch demo:true
+asc sorted demo:[1, 2, 2, 3, 4, 5, 6, 7, 7, 8, 8, 9, 9, 35]
+desc sorted demo:[35, 9, 9, 8, 8, 7, 7, 6, 5, 4, 3, 2, 2, 1]
+limit demo:[9, 8, 7]
+skip demo:[7, 6, 5, 4, 3, 2, 1, 2, 35, 9, 7, 8]
+skip demo:[9, 8, 7, 6, 5, 4, 3, 2, 1, 35]
+parallel demo:[9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 35, 9, 7, 8]
+groupby demo:{1=[1], 2=[2, 2], 35=[35], 3=[3], 4=[4], 5=[5], 6=[6], 7=[7, 7], 8=[8, 8], 9=[9, 9]}
+partition by >10:{false=[9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 9, 7, 8], true=[35]}
+partition by >10 with downstream:{false=13, true=1}
+reduce with Identity:106
+reduce without Identity:106
+genereate demo [-328968850, 1932035942, 1141684548, 2105138362, 210658620, -998069318, -1563771043, 617052578, 1129141294, -1265444298]
+genereate with udf supplier demo [17, 59, 29, 99, 0, 27, 1, 50, 62, 83]
+iterator demo [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+averagingInt demo 7.571428571428571
+summarizingInt demo:
+---------------max:35
+---------------count:14
+---------------getMin:1
+---------------getSum:106
+---------------getAverage:7.571428571428571
